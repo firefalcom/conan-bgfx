@@ -1,46 +1,49 @@
-from conans import ConanFile, CMake, tools
-
+from   conans       import ConanFile, CMake, tools
+from   conans.tools import download, unzip, os_info
+from   distutils.dir_util import copy_tree
+import os
+import shutil
 
 class BgfxConan(ConanFile):
-    name = "bgfx"
-    version = "master"
-    license = "<Put the package license here>"
-    url = "<Package recipe repository url here, for issues about the package>"
-    description = "<Description of Bgfx here>"
-    settings = "os", "compiler", "build_type", "arch"
-    options = {"shared": [True, False]}
+    name            = "bgfx"
+    version         = "master"
+    description     = "Conan package for bgfx."
+    url             = "https://github.com/bkaradzic/bgfx"
+    license         = "BSD"
+    settings        = "arch", "build_type", "compiler", "os"
+    generators      = "cmake"
+    options         = {"shared": [True, False]}
     default_options = "shared=False"
-    generators = "cmake"
 
     def source(self):
-        self.run("git clone https://github.com/memsharded/hello.git")
-        self.run("cd hello && git checkout static_shared")
-        # This small hack might be useful to guarantee proper /MT /MD linkage
-        # in MSVC if the packaged project doesn't have variables to set it
-        # properly
-        tools.replace_in_file("hello/CMakeLists.txt", "PROJECT(MyHello)",
-                              '''PROJECT(MyHello)
-include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
-conan_basic_setup()''')
+        self.run("git clone git://github.com/bkaradzic/bx.git")
+        self.run("git clone git://github.com/bkaradzic/bimg.git")
+        self.run("git clone git://github.com/bkaradzic/bgfx.git")
+        self.run("git clone git://github.com/JoshuaBrookover/bgfx.cmake.git")
+        copy_tree("bgfx.cmake", ".")
 
     def build(self):
-        cmake = CMake(self)
-        cmake.configure(source_folder="hello")
-        cmake.build()
+        cmake          = CMake(self)
+        shared_options = "-DBUILD_SHARED_LIBS=ON" if self.options.shared else "-DBUILD_SHARED_LIBS=OFF"
+        fixed_options  = "-DBGFX_BUILD_EXAMPLES=OFF"
+        self.run("cmake %s %s %s" % (cmake.command_line, shared_options, fixed_options))
+        self.run("cmake --build . %s" % cmake.build_config)
 
-        # Explicit way:
-        # self.run('cmake %s/hello %s'
-        #          % (self.source_folder, cmake.command_line))
-        # self.run("cmake --build . %s" % cmake.build_config)
+    def collect_headers(self, include_folder):
+        self.copy("*.h"  , dst="include", src=include_folder)
+        self.copy("*.hpp", dst="include", src=include_folder)
+        self.copy("*.inl", dst="include", src=include_folder)
 
     def package(self):
-        self.copy("*.h", dst="include", src="hello")
-        self.copy("*hello.lib", dst="lib", keep_path=False)
+        self.collect_headers("bgfx/include")
+        self.collect_headers("bimg/include")
+        self.collect_headers("bx/include"  )
+        self.copy("*.a"  , dst="lib", keep_path=False)
+        self.copy("*.so" , dst="lib", keep_path=False)
+        self.copy("*.lib", dst="lib", keep_path=False)
         self.copy("*.dll", dst="bin", keep_path=False)
-        self.copy("*.so", dst="lib", keep_path=False)
-        self.copy("*.dylib", dst="lib", keep_path=False)
-        self.copy("*.a", dst="lib", keep_path=False)
 
     def package_info(self):
-        self.cpp_info.libs = ["hello"]
-
+        self.cpp_info.libs = ["bgfxd", "bimgd", "bxd"] if self.settings.build_type == "Debug" else ["bgfx", "bimg", "bx"]
+        if os_info.is_macos:
+            self.cpp_info.exelinkflags = ["-framework Cocoa", "-framework QuartzCore", "-framework OpenGL", "-weak_framework Metal"]

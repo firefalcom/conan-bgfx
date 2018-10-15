@@ -12,7 +12,17 @@ include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup()
 conan_define_targets()
 
-set(CMAKE_CXX_FLAGS "-ObjC++")
+if(UNIX AND NOT APPLE)
+    set(LINUX TRUE)
+endif()
+
+if(APPLE)
+    set(CMAKE_CXX_FLAGS "-ObjC++")
+endif()
+
+if(LINUX)
+    set(CMAKE_CXX_FLAGS "-DLINUX")
+endif()
 
 add_executable(bgfx_test bgfx_test.cpp)
 set_target_properties(bgfx_test PROPERTIES LINK_FLAGS ${CONAN_EXE_LINKER_FLAGS})

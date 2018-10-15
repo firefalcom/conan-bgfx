@@ -3,6 +3,7 @@ from   conans.tools import download, unzip, os_info
 from   distutils.dir_util import copy_tree
 import os
 import shutil
+import multiprocessing
 
 class BgfxConan(ConanFile):
     name            = "bgfx"
@@ -27,7 +28,7 @@ class BgfxConan(ConanFile):
         shared_options = "-DBUILD_SHARED_LIBS=ON" if self.options.shared else "-DBUILD_SHARED_LIBS=OFF"
         fixed_options  = "-DBGFX_BUILD_EXAMPLES=OFF"
         self.run("cmake %s %s %s" % (cmake.command_line, shared_options, fixed_options))
-        self.run("cmake --build . %s" % cmake.build_config)
+        self.run("cmake --build . %s -- -j %d" % (cmake.build_config, multiprocessing.cpu_count()))
 
     def collect_headers(self, include_folder):
         self.copy("*.h"  , dst="include", src=include_folder)
@@ -47,3 +48,6 @@ class BgfxConan(ConanFile):
         self.cpp_info.libs = ["bgfxd", "bimgd", "bxd"] if self.settings.build_type == "Debug" else ["bgfx", "bimg", "bx"]
         if os_info.is_macos:
             self.cpp_info.exelinkflags = ["-framework Cocoa", "-framework QuartzCore", "-framework OpenGL", "-weak_framework Metal"]
+        if os_info.is_linux:
+            self.cpp_info.exelinkflags = ["-lGL", "-lGLU", "-lX11", "-ldl", "-lpthread"]
+

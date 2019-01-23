@@ -12,7 +12,7 @@ include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup()
 conan_define_targets()
 
-set(CMAKE_CXX_FLAGS "-ObjC++")
+#set(CMAKE_CXX_FLAGS "-ObjC++")
 
 add_executable(bgfx_test bgfx_test.cpp)
 set_target_properties(bgfx_test PROPERTIES LINK_FLAGS ${CONAN_EXE_LINKER_FLAGS})

@@ -16,17 +16,19 @@ class BgfxConan(ConanFile):
     default_options = "shared=False"
 
     def source(self):
-        self.run("git clone git://github.com/bkaradzic/bx.git")
-        self.run("git clone git://github.com/bkaradzic/bimg.git")
-        self.run("git clone git://github.com/bkaradzic/bgfx.git")
+        #self.run("git clone git://github.com/bkaradzic/bx.git")
+        #self.run("git clone git://github.com/bkaradzic/bimg.git")
+        #self.run("git clone git://github.com/bkaradzic/bgfx.git")
         self.run("git clone git://github.com/JoshuaBrookover/bgfx.cmake.git")
         copy_tree("bgfx.cmake", ".")
+        self.run("git submodule update --init --recursive" )
 
     def build(self):
         cmake          = CMake(self)
         shared_options = "-DBUILD_SHARED_LIBS=ON" if self.options.shared else "-DBUILD_SHARED_LIBS=OFF"
         fixed_options  = "-DBGFX_BUILD_EXAMPLES=OFF"
-        self.run("cmake %s %s %s" % (cmake.command_line, shared_options, fixed_options))
+        tool_options   = "-DBGFX_BUILD_TOOLS=OFF" if self.settings.os == "Emscripten" else ""
+        self.run("cmake %s %s %s %s" % (cmake.command_line, shared_options, fixed_options, tool_options))
         self.run("cmake --build . %s" % cmake.build_config)
 
     def collect_headers(self, include_folder):
@@ -45,5 +47,5 @@ class BgfxConan(ConanFile):
 
     def package_info(self):
         self.cpp_info.libs = ["bgfxd", "bimgd", "bxd"] if self.settings.build_type == "Debug" else ["bgfx", "bimg", "bx"]
-        if os_info.is_macos:
+        if self.settings.os == "Macos":
             self.cpp_info.exelinkflags = ["-framework Cocoa", "-framework QuartzCore", "-framework OpenGL", "-weak_framework Metal"]

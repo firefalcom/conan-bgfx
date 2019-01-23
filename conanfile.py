@@ -49,3 +49,5 @@ class BgfxConan(ConanFile):
         self.cpp_info.libs = ["bgfxd", "bimgd", "bxd"] if self.settings.build_type == "Debug" else ["bgfx", "bimg", "bx"]
         if self.settings.os == "Macos":
             self.cpp_info.exelinkflags = ["-framework Cocoa", "-framework QuartzCore", "-framework OpenGL", "-weak_framework Metal"]
+        if self.settings.os == "Linux":
+            self.cpp_info.libs.extend(["GL", "X11"])

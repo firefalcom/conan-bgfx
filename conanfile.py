@@ -19,7 +19,8 @@ class BgfxConan(ConanFile):
         #self.run("git clone git://github.com/bkaradzic/bx.git")
         #self.run("git clone git://github.com/bkaradzic/bimg.git")
         #self.run("git clone git://github.com/bkaradzic/bgfx.git")
-        self.run("git clone git://github.com/JoshuaBrookover/bgfx.cmake.git")
+        self.run("git clone git@github.com:firefalcom/bgfx.cmake.git")
+        self.run("cd bgfx.cmake && git checkout feature/opengl-version")
         copy_tree("bgfx.cmake", ".")
         self.run("git submodule update --init --recursive" )
 
@@ -28,7 +29,8 @@ class BgfxConan(ConanFile):
         shared_options = "-DBUILD_SHARED_LIBS=ON" if self.options.shared else "-DBUILD_SHARED_LIBS=OFF"
         fixed_options  = "-DBGFX_BUILD_EXAMPLES=OFF"
         tool_options   = "-DBGFX_BUILD_TOOLS=OFF" if self.settings.os == "Emscripten" else ""
-        self.run("cmake %s %s %s %s" % (cmake.command_line, shared_options, fixed_options, tool_options))
+        opengl_version = "-DBGFX_OPENGL_VERSION=33"
+        self.run("cmake %s %s %s %s %s" % (cmake.command_line, shared_options, fixed_options, tool_options, opengl_version))
         self.run("cmake --build . %s" % cmake.build_config)
 
     def collect_headers(self, include_folder):

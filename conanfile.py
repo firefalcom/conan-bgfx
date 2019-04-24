@@ -1,8 +1,5 @@
-from   conans       import ConanFile, CMake, tools
-from   conans.tools import download, unzip, os_info
+from   conans       import ConanFile, CMake
 from   distutils.dir_util import copy_tree
-import os
-import shutil
 
 class BgfxConan(ConanFile):
     name            = "bgfx"
@@ -52,4 +49,4 @@ class BgfxConan(ConanFile):
         if self.settings.os == "Macos":
             self.cpp_info.exelinkflags = ["-framework Cocoa", "-framework QuartzCore", "-framework OpenGL", "-weak_framework Metal"]
         if self.settings.os == "Linux":
-            self.cpp_info.libs.extend(["GL", "X11"])
+            self.cpp_info.libs.extend(["GL", "X11", "pthread", "dl"])

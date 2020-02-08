@@ -43,6 +43,7 @@ class BgfxConan(ConanFile):
         self.copy("*.so" , dst="lib", keep_path=False)
         self.copy("*.lib", dst="lib", keep_path=False)
         self.copy("*.dll", dst="bin", keep_path=False)
+        self.copy("shaderc", dst="bin")
 
     def package_info(self):
         self.cpp_info.libs = ["bgfxd", "bimgd", "bxd"] if self.settings.build_type == "Debug" else ["bgfx", "bimg", "bx"]

@@ -3,6 +3,7 @@
 
 int main()
 {
+	return 0;
 	if( !bgfx::init() )
 	{
 		// Since we don't have any platform data (window handle, etc) for it took into,

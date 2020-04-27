@@ -3,7 +3,7 @@ from   distutils.dir_util import copy_tree
 
 class BgfxConan(ConanFile):
     name            = "bgfx"
-    version         = "master"
+    version         = "7083"
     description     = "Conan package for bgfx."
     url             = "https://github.com/bkaradzic/bgfx"
     license         = "BSD"
@@ -13,11 +13,8 @@ class BgfxConan(ConanFile):
     default_options = "shared=False"
 
     def source(self):
-        #self.run("git clone git://github.com/bkaradzic/bx.git")
-        #self.run("git clone git://github.com/bkaradzic/bimg.git")
-        #self.run("git clone git://github.com/bkaradzic/bgfx.git")
         self.run("git clone git@github.com:firefalcom/bgfx.cmake.git")
-        self.run("cd bgfx.cmake && git checkout feature/opengl-version")
+        self.run("cd bgfx.cmake && git checkout v%s" % self.version)
         copy_tree("bgfx.cmake", ".")
         self.run("git submodule update --init --recursive" )
 
@@ -48,6 +45,7 @@ class BgfxConan(ConanFile):
 
     def package_info(self):
         self.cpp_info.libs = ["bgfxd", "bimgd", "bxd"] if self.settings.build_type == "Debug" else ["bgfx", "bimg", "bx"]
+        self.cpp_info.libs.extend(["astc-codec", "astc", "edtaa3", "etc1", "etc2", "iqa", "squish", "nvtt", "pvrtc"])
         if self.settings.os == "Macos":
             self.cpp_info.exelinkflags = ["-framework Cocoa", "-framework QuartzCore", "-framework OpenGL", "-weak_framework Metal"]
         if self.settings.os == "Linux":

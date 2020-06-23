@@ -22,7 +22,7 @@ class BgfxTestConan(ConanFile):
     def test(self):
         if not tools.cross_building(self.settings):
             os.chdir("bin")
-            if not self.settings.os == "Windows":
-                self.run(".%sbgfx_test.exe" % os.sep) 
+            if self.settings.os == "Windows":
+                self.run(".%sbgfx_test.exe" % os.sep)
             else:
-                self.run(".%sbgfx_test" % os.sep) 
+                self.run(".%sbgfx_test" % os.sep)

@@ -24,8 +24,7 @@ class BgfxConan(ConanFile):
             "BUILD_SHARED_LIBS": self.options.shared,
             "BGFX_BUILD_EXAMPLES": False,
             "BGFX_BUILD_TOOLS": False if self.settings.os == "Emscripten" else True,
-            "BGFX_OPENGL_VERSION": 33,
-            "BGFX_CONFIG_DEBUG": False
+            "BGFX_OPENGL_VERSION": 33
             }
 
         cmake.configure(None, options)

@@ -3,7 +3,7 @@ from   distutils.dir_util import copy_tree
 
 class BgfxConan(ConanFile):
     name            = "bgfx"
-    version         = "7083"
+    version         = "7188"
     description     = "Conan package for bgfx."
     url             = "https://github.com/bkaradzic/bgfx"
     license         = "BSD"
@@ -47,7 +47,7 @@ class BgfxConan(ConanFile):
         self.copy("*.exe", dst="bin", keep_path=False)
 
     def package_info(self):
-        self.cpp_info.libs = ["bgfxd", "bimgd", "bxd"] if self.settings.build_type == "Debug" else ["bgfx", "bimg", "bx"]
+        self.cpp_info.libs = ["bgfxd", "bimgd", "bxd"] if self.settings.build_type == "Debug" and self.settings.os == "Windows"  else ["bgfx", "bimg", "bx"]
         self.cpp_info.libs.extend(["astc-codec", "astc", "edtaa3", "etc1", "etc2", "iqa", "squish", "nvtt", "pvrtc"])
         if self.settings.os == "Macos":
             self.cpp_info.exelinkflags = ["-framework Cocoa", "-framework QuartzCore", "-framework OpenGL", "-weak_framework Metal"]

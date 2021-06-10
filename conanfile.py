@@ -9,8 +9,14 @@ class BgfxConan(ConanFile):
     license         = "BSD"
     settings        = "arch", "build_type", "compiler", "os"
     generators      = "cmake"
-    options         = {"shared": [True, False]}
-    default_options = "shared=False"
+    options         = {
+            "shared": [True, False],
+            "multithreaded": [True, False]
+            }
+    default_options = {
+            "shared": False,
+            "multithreaded": True
+            }
 
     def source(self):
         self.run("git clone https://github.com/firefalcom/bgfx.cmake.git")
@@ -22,6 +28,7 @@ class BgfxConan(ConanFile):
         cmake          = CMake(self)
         options = {
             "BUILD_SHARED_LIBS": self.options.shared,
+            "BGFX_CONFIG_MULTITHREADED": self.options.multithreaded,
             "BGFX_BUILD_EXAMPLES": False,
             "BGFX_BUILD_TOOLS": False if self.settings.os == "Emscripten" else True,
             "BGFX_OPENGL_VERSION": 33

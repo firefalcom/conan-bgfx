@@ -3,7 +3,7 @@ from   distutils.dir_util import copy_tree
 
 class BgfxConan(ConanFile):
     name            = "bgfx"
-    version         = "7188"
+    version         = "7816-2"
     description     = "Conan package for bgfx."
     url             = "https://github.com/bkaradzic/bgfx"
     license         = "BSD"
@@ -30,7 +30,7 @@ class BgfxConan(ConanFile):
             "BUILD_SHARED_LIBS": self.options.shared,
             "BGFX_CONFIG_MULTITHREADED": self.options.multithreaded,
             "BGFX_BUILD_EXAMPLES": False,
-            "BGFX_BUILD_TOOLS": False if self.settings.os == "Emscripten" else True,
+            "BGFX_BUILD_TOOLS": False if self.settings.os == "Emscripten" or self.settings.os == "Switch" else True,
             "BGFX_OPENGL_VERSION": 33
             }
 
@@ -55,7 +55,9 @@ class BgfxConan(ConanFile):
 
     def package_info(self):
         self.cpp_info.libs = ["bgfx", "bimg", "bx"]
-        self.cpp_info.libs.extend(["astc-codec", "astc", "edtaa3", "etc1", "etc2", "iqa", "squish", "nvtt", "pvrtc"])
+        self.cpp_info.libs.extend(["astc-codec", "astc", "edtaa3", "etc1", "etc2", "iqa", "squish", "pvrtc"])
+        if self.settings.os != "Switch":
+            self.cpp_info.libs.extend(["nvtt"])
         if self.settings.os == "Macos":
             self.cpp_info.exelinkflags = ["-framework Cocoa", "-framework QuartzCore", "-framework OpenGL", "-weak_framework Metal"]
         if self.settings.os == "Linux":

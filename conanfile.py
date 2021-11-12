@@ -20,7 +20,7 @@ class BgfxConan(ConanFile):
 
     def source(self):
         self.run("git clone git@github.com:firefalcom/bgfx.cmake.git")
-        self.run("cd bgfx.cmake && git checkout v%s" % self.version.split('-')[0])
+        self.run("cd bgfx.cmake && git checkout v%s" % self.version)
         copy_tree("bgfx.cmake", ".")
         self.run("git submodule update --init --recursive")
 
@@ -30,7 +30,7 @@ class BgfxConan(ConanFile):
             "BUILD_SHARED_LIBS": self.options.shared,
             "BGFX_CONFIG_MULTITHREADED": self.options.multithreaded,
             "BGFX_BUILD_EXAMPLES": False,
-            "BGFX_BUILD_TOOLS": False if self.settings.os == "Emscripten" or self.settings.os == "Switch" else True,
+            "BGFX_BUILD_TOOLS": False,
             "BGFX_OPENGL_VERSION": 33
             }
 

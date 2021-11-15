@@ -3,7 +3,7 @@ from   distutils.dir_util import copy_tree
 
 class BgfxConan(ConanFile):
     name            = "bgfx"
-    version         = "7816-2"
+    version         = "7816-3"
     description     = "Conan package for bgfx."
     url             = "https://github.com/bkaradzic/bgfx"
     license         = "BSD"
@@ -19,7 +19,7 @@ class BgfxConan(ConanFile):
             }
 
     def source(self):
-        self.run("git clone https://github.com/firefalcom/bgfx.cmake.git")
+        self.run("git clone git@github.com:firefalcom/bgfx.cmake.git")
         self.run("cd bgfx.cmake && git checkout v%s" % self.version)
         copy_tree("bgfx.cmake", ".")
         self.run("git submodule update --init --recursive")
@@ -30,7 +30,7 @@ class BgfxConan(ConanFile):
             "BUILD_SHARED_LIBS": self.options.shared,
             "BGFX_CONFIG_MULTITHREADED": self.options.multithreaded,
             "BGFX_BUILD_EXAMPLES": False,
-            "BGFX_BUILD_TOOLS": False if self.settings.os == "Emscripten" or self.settings.os == "Switch" else True,
+            "BGFX_BUILD_TOOLS": False,
             "BGFX_OPENGL_VERSION": 33
             }
 

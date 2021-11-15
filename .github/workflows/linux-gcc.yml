@@ -1,0 +1,53 @@
+name: GCC Conan
+
+on:
+  push:
+    tags:
+      - v*
+
+env:
+  CONAN_LOGIN_USERNAME: ${{ secrets.CONAN_USER }}
+  CONAN_PASSWORD: ${{ secrets.CONAN_PASSWORD }}
+  CONAN_REPOSITORY: ${{ secrets.CONAN_URL }}
+  CONAN_NON_INTERACTIVE: True
+  CONAN_SETTINGS_URL: ${{ secrets.CONAN_SETTINGS_URL }}
+  PACKAGE_REFERENCE: bgfx*
+
+jobs:
+  conan-with-gcc:
+    name: Conan
+    runs-on: ubuntu-20.04
+    strategy:
+      fail-fast: false
+      matrix:
+        build_type: [Debug, Release]
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ssh-key: ${{secrets.BOT_SSH_KEY}}
+      - uses: firefalcom/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{secrets.BOT_SSH_KEY}}
+      - uses: actions/checkout@v2
+      - name: Install prerequisites
+        run: |
+          sudo apt-get update
+          sudo pip3 install wheel setuptools --upgrade
+          sudo pip3 install conan --upgrade
+          export PATH=$PATH:$HOME/.local/bin
+          conan --version
+          conan profile new default --detect
+          conan config install ${CONAN_SETTINGS_URL}
+          sudo apt install binutils-dev libgl-dev
+      - name: Configure Conan
+        run: conan remote add firefalcom ${CONAN_REPOSITORY} --insert 0
+      - name: Conan create
+        run: |
+          conan create -s build_type=${{ matrix.build_type }} \
+            -s arch_build=x86_64 \
+            -s os_build=Linux \
+            -s compiler.libcxx=libstdc++11 \
+            -b missing -b outdated . firefalcom/stable
+      - name: Conan upload
+        run: |
+          conan upload --all -c -r firefalcom ${PACKAGE_REFERENCE} --retry 10 --retry-wait 20 --force
